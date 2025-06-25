@@ -46,7 +46,7 @@ const DayAvailability = ({
             onCheckedChange={(checked) => {
               form.setValue(`days.${index}.isAvailable`, checked);
               if (!checked) {
-                form.setValue(`days.${index}.startTime`, "09:00");
+                form.setValue(`days.${index}.startTime`, "08:00");
                 form.setValue(`days.${index}.endTime`, "17:00");
               }
             }}

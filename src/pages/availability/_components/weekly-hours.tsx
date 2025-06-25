@@ -126,7 +126,7 @@ const WeeklyHoursRow = ({
         .findIndex((item) => item.day === day);
       if (index !== -1) {
         form.setValue(`days.${index}.isAvailable`, false);
-        form.setValue(`days.${index}.startTime`, "09:00");
+        form.setValue(`days.${index}.startTime`, "08:00");
         form.setValue(`days.${index}.endTime`, "17:00");
       }
     },

@@ -38,14 +38,30 @@ const BookingCalendar = ({
 
   const availability = data?.data || [];
 
-  // Get time slots for the selected date
-  const timeSlots = selectedDate
+  // Function to check if a time slot is in the excluded afternoon period (12:00-16:00)
+  const isAfternoonSlot = (slot: string) => {
+    // Parse the slot time (format: "HH:mm")
+    const [hours, minutes] = slot.split(':').map(Number);
+    const slotMinutes = hours * 60 + minutes;
+    
+    // 12:00 PM = 720 minutes, 4:00 PM = 960 minutes
+    const startExclude = 12 * 60; // 12:00 PM
+    const endExclude = 16 * 60;   // 4:00 PM
+    
+    return slotMinutes >= startExclude && slotMinutes < endExclude;
+  };
+
+  // Get time slots for the selected date and filter out afternoon slots
+  const allTimeSlots = selectedDate
     ? availability?.find(
         (day) =>
           day.day ===
           format(selectedDate.toDate(timezone), "EEEE").toUpperCase()
       )?.slots || []
     : [];
+
+  // Filter out afternoon slots (12:00 PM - 4:00 PM)
+  const timeSlots = allTimeSlots.filter(slot => !isAfternoonSlot(slot));
 
   const isDateUnavailable = (date: DateValue) => {
     // Get the day of the week (e.g., "MONDAY")
