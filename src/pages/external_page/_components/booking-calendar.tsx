@@ -37,7 +37,7 @@ const BookingCalendar = ({
   });
 
   // Fetch already booked slots to prevent overbooking
-  const { data: bookedSlotsData, isError: bookedSlotsError, error: bookedSlotsErrorDetails } = useQuery({
+  const { data: bookedSlotsData } = useQuery({
     queryKey: ["booked_slots", eventId],
     queryFn: () => getPublicBookedSlotsByEventIdQueryFn(eventId),
     enabled: !!eventId, // Only run if eventId exists
