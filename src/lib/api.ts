@@ -127,3 +127,9 @@ export const scheduleMeetingMutationFn = async (data: CreateMeetingType) => {
   const response = await API.post("/meeting/public/create", data);
   return response.data;
 };
+
+// Get booked slots for an event (for overbooking prevention)
+export const getPublicBookedSlotsByEventIdQueryFn = async (eventId: string): Promise<{message: string, bookedSlots: string[]}> => {
+  const response = await PublicAPI.get(`/meeting/public/booked-slots/${eventId}`);
+  return response.data;
+};

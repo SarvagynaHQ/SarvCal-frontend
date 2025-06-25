@@ -3,7 +3,7 @@ import { Calendar } from "@/components/calendar";
 import { CalendarDate, DateValue } from "@internationalized/date";
 import { useBookingState } from "@/hooks/use-booking-state";
 import { decodeSlot, formatSlot } from "@/lib/helper";
-import { getPublicAvailabilityByEventIdQueryFn } from "@/lib/api";
+import { getPublicAvailabilityByEventIdQueryFn, getPublicBookedSlotsByEventIdQueryFn } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { ErrorAlert } from "@/components/ErrorAlert";
 import { Loader } from "@/components/loader";
@@ -36,7 +36,15 @@ const BookingCalendar = ({
     queryFn: () => getPublicAvailabilityByEventIdQueryFn(eventId),
   });
 
+  // Fetch already booked slots to prevent overbooking
+  const { data: bookedSlotsData } = useQuery({
+    queryKey: ["booked_slots", eventId],
+    queryFn: () => getPublicBookedSlotsByEventIdQueryFn(eventId),
+    enabled: !!eventId, // Only run if eventId exists
+  });
+
   const availability = data?.data || [];
+  const bookedSlots = bookedSlotsData?.bookedSlots || [];
 
   // Function to check if a time slot is in the excluded afternoon period (12:00-16:00)
   const isAfternoonSlot = (slot: string) => {
@@ -62,6 +70,9 @@ const BookingCalendar = ({
 
   // Filter out afternoon slots (12:00 PM - 4:00 PM)
   const timeSlots = allTimeSlots.filter(slot => !isAfternoonSlot(slot));
+
+  // Filter out booked slots
+  const availableTimeSlots = timeSlots.filter(slot => !bookedSlots.includes(slot));
 
   const isDateUnavailable = (date: DateValue) => {
     // Get the day of the week (e.g., "MONDAY")
@@ -130,7 +141,7 @@ const BookingCalendar = ({
                 className="flex-[1_1_100px] pr-[8px] overflow-x-hidden overflow-y-auto scrollbar-thin
              scrollbar-track-transparent scroll--bar h-[400px]"
               >
-                {timeSlots.map((slot, i) => {
+                {availableTimeSlots.map((slot, i) => {
                   const formattedSlot = formatSlot(slot, timezone, hourType);
                   return (
                     <div role="list" key={i}>
