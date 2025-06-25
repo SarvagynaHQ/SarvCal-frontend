@@ -116,8 +116,7 @@ export const getSinglePublicEventBySlugQueryFn = async (data: {
 };
 
 export const getPublicAvailabilityByEventIdQueryFn = async (
-  eventId: string,
-  timezone?: string
+  eventId: string
 ): Promise<PublicAvailabilityEventResponseType> => {
   const response = await PublicAPI.get(`/availability/public/${eventId}`);
   return response.data;
