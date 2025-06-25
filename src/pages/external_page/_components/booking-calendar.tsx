@@ -32,19 +32,20 @@ const BookingCalendar = ({
   } = useBookingState();
 
   const { data, isFetching, isError, error } = useQuery({
-    queryKey: ["availbility_single_event", eventId],
+    queryKey: ["availability_single_event", eventId],
     queryFn: () => getPublicAvailabilityByEventIdQueryFn(eventId),
   });
 
   // Fetch already booked slots to prevent overbooking
-  const { data: bookedSlotsData } = useQuery({
+  const { data: bookedSlotsData, isError: bookedSlotsError, error: bookedSlotsErrorDetails } = useQuery({
     queryKey: ["booked_slots", eventId],
     queryFn: () => getPublicBookedSlotsByEventIdQueryFn(eventId),
     enabled: !!eventId, // Only run if eventId exists
+    retry: false, // Don't retry if endpoint doesn't exist
   });
 
-  const availability = data?.data || [];
-  const bookedSlots = bookedSlotsData?.bookedSlots || [];
+  const availability = data?.data ?? [];
+  const bookedSlots = bookedSlotsData?.bookedSlots ?? [];
 
   // Function to check if a time slot is in the excluded afternoon period (12:00-16:00)
   const isAfternoonSlot = (slot: string) => {
@@ -186,6 +187,11 @@ const BookingCalendar = ({
                              ? "opacity-0"
                              : "opacity-100"
                          }
+                           ${
+                             bookedSlots.includes(slot)
+                               ? "bg-red-200 opacity-50"
+                               : ""
+                           }
                            `}
                           onClick={() => handleSelectSlot(slot)}
                         >
