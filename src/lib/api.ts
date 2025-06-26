@@ -5,6 +5,7 @@ import {
   GetAllIntegrationResponseType,
   LoginResponseType,
   loginType,
+  MeetingDetailType,
   PeriodType,
   PublicAvailabilityEventResponseType,
   PublicEventResponseType,
@@ -14,6 +15,7 @@ import {
   UserAvailabilityResponseType,
   UserEventListResponse,
   UserMeetingsResponseType,
+  RescheduleMeetingType,
 } from "@/types/api.type";
 import { API, PublicAPI } from "./axios-client";
 import { IntegrationAppType, VideoConferencingPlatform } from "./types";
@@ -94,6 +96,20 @@ export const getUserMeetingsQueryFn = async (
 
 export const cancelMeetingMutationFn = async (meetingId: string) => {
   const response = await API.put(`/meeting/cancel/${meetingId}`, {});
+  return response.data;
+};
+
+export const getMeetingDetailsQueryFn = async (
+  meetingId: string
+): Promise<MeetingDetailType> => {
+  const response = await API.get(`/meeting/${meetingId}`);
+  return response.data;
+};
+
+export const rescheduleMeetingMutationFn = async (
+  data: RescheduleMeetingType
+) => {
+  const response = await API.put("/meeting/reschedule", data);
   return response.data;
 };
 

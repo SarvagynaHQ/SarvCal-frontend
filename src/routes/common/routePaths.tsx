@@ -12,6 +12,7 @@ export const PROTECTED_ROUTES = {
   INTEGRATIONS: "/app/integrations",
   AVAILBILITIY: "/app/availability/schedules",
   MEETINGS: "/app/scheduled_events",
+  RESCHEDULE: "/reschedule/:meetingId",
 };
 
 export const PUBLIC_ROUTES = {

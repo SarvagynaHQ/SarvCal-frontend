@@ -29,6 +29,7 @@ export type CreateEventPayloadType = {
 export interface UserType {
   name: string;
   imageUrl: string | null;
+  username: string;
 }
 export interface EventType {
   id: string;
@@ -151,6 +152,27 @@ export interface CreateMeetingType {
   guestName: string;
   guestEmail: string;
   additionalInfo?: string;
+  timezone: string;
 }
 
 export type PeriodType = "UPCOMING" | "PAST" | "CANCELLED";
+
+export type MeetingDetailType = {
+  id: string;
+  title: string;
+  description: string;
+  start: string;
+  end: string;
+  duration: number;
+  location: string;
+  locationType: string;
+  status: string;
+  attendees: any;
+  user: UserType;
+};
+
+export type RescheduleMeetingType = {
+  meetingId: string;
+  start: string;
+  end: string;
+};

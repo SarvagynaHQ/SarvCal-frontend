@@ -7,6 +7,7 @@ import Availability from "@/pages/availability";
 import Integrations from "@/pages/integrations";
 import UserEventsPage from "@/pages/external_page/user-events";
 import UserSingleEventPage from "@/pages/external_page/user-single-event";
+import ReschedulePage from "@/pages/meeting/reschedule";
 
 export const authenticationRoutePaths = [
   { path: AUTH_ROUTES.SIGN_IN, element: <SignIn /> },
@@ -18,6 +19,7 @@ export const protectedRoutePaths = [
   { path: PROTECTED_ROUTES.MEETINGS, element: <Meetings /> },
   { path: PROTECTED_ROUTES.AVAILBILITIY, element: <Availability /> },
   { path: PROTECTED_ROUTES.INTEGRATIONS, element: <Integrations /> },
+  { path: PROTECTED_ROUTES.RESCHEDULE, element: <ReschedulePage /> },
 ];
 
 export const publicRoutePaths = [

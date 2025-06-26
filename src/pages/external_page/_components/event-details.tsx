@@ -5,14 +5,16 @@ import { useBookingState } from "@/hooks/use-booking-state";
 import { formatSelectedSlot } from "@/lib/helper";
 import { UserType } from "@/types/api.type";
 
-const EventDetails = (props: {
-  eventTitle: string;
-  description: string;
-  user?: UserType;
+type EventDetailsProps = {
+  eventTitle?: string;
+  description?: string;
+  user?: UserType | null;
+  eventLocationType?: string;
   username: string;
   duration: number;
-  eventLocationType: string;
-}) => {
+};
+
+const EventDetails = (props: EventDetailsProps) => {
   const {
     eventTitle,
     description,
