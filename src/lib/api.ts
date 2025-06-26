@@ -155,7 +155,22 @@ export const getRealTimeAvailabilityQueryFn = async (
 // Check if user has Google Calendar integration enabled
 export const checkGoogleCalendarIntegrationQueryFn = async (
   eventId: string
-): Promise<{hasIntegration: boolean, message: string}> => {
+): Promise<{
+  message: string;
+  isConnected: boolean;
+  eventId: string;
+  eventTitle: string;
+  eventOwner: {
+    id: string;
+    email: string;
+  };
+  integration: {
+    provider: string;
+    app_type: string;
+    category: string;
+    connectedAt: string;
+  };
+}> => {
   const response = await PublicAPI.get(`/integration/google-calendar/check/${eventId}`);
   return response.data;
 };

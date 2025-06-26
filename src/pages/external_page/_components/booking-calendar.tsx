@@ -65,7 +65,7 @@ const BookingCalendar = ({
       eventId, 
       selectedDate ? format(selectedDate.toDate(timezone), "yyyy-MM-dd") : ""
     ),
-    enabled: !!eventId && !!selectedDate && !isGoogleIntegrationError && googleIntegrationData?.hasIntegration === true,
+    enabled: !!eventId && !!selectedDate && !isGoogleIntegrationError && googleIntegrationData?.isConnected === true,
     retry: false, // Don't retry if endpoint doesn't exist
     staleTime: 1 * 60 * 1000, // Cache for 1 minute
   });
@@ -73,7 +73,7 @@ const BookingCalendar = ({
   const availability = data?.data ?? [];
   const bookedSlots = bookedSlotsData?.bookedSlots ?? [];
   const googleConflicts = (googleConflictsData?.conflicts ?? []) as string[];
-  const hasGoogleIntegration = !isGoogleIntegrationError && (googleIntegrationData?.hasIntegration ?? false);
+  const hasGoogleIntegration = !isGoogleIntegrationError && (googleIntegrationData?.isConnected ?? false);
 
   // Log Google Calendar integration status for debugging
   if (isGoogleIntegrationError) {
