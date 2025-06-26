@@ -65,7 +65,11 @@ const BookingCalendar = ({
       eventId, 
       selectedDate ? format(selectedDate.toDate(timezone), "yyyy-MM-dd") : ""
     ),
-    enabled: !!eventId && !!selectedDate && !isGoogleIntegrationError && googleIntegrationData?.isConnected === true,
+    enabled: !!eventId && 
+             !!selectedDate && 
+             !isGoogleIntegrationError && 
+             googleIntegrationData !== undefined &&
+             googleIntegrationData?.isConnected === true,
     retry: false, // Don't retry if endpoint doesn't exist
     staleTime: 1 * 60 * 1000, // Cache for 1 minute
   });
