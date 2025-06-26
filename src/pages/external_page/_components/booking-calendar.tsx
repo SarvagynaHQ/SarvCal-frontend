@@ -50,28 +50,38 @@ const BookingCalendar = ({
   });
 
   // Check if Google Calendar integration is enabled
-  const { data: googleIntegrationData } = useQuery({
+  const { data: googleIntegrationData, isError: isGoogleIntegrationError } = useQuery({
     queryKey: ["google_calendar_integration", eventId],
     queryFn: () => checkGoogleCalendarIntegrationQueryFn(eventId),
     enabled: !!eventId,
     retry: false, // Don't retry if endpoint doesn't exist
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   // Fetch Google Calendar conflicts for the selected date
-  const { data: googleConflictsData, isFetching: isGoogleConflictsFetching } = useQuery({
+  const { data: googleConflictsData, isFetching: isGoogleConflictsFetching, isError: isGoogleConflictsError } = useQuery({
     queryKey: ["google_calendar_conflicts", eventId, selectedDate?.toString()],
     queryFn: () => getGoogleCalendarConflictsQueryFn(
       eventId, 
       selectedDate ? format(selectedDate.toDate(timezone), "yyyy-MM-dd") : ""
     ),
-    enabled: !!eventId && !!selectedDate && googleIntegrationData?.hasIntegration === true,
+    enabled: !!eventId && !!selectedDate && !isGoogleIntegrationError && googleIntegrationData?.hasIntegration === true,
     retry: false, // Don't retry if endpoint doesn't exist
+    staleTime: 1 * 60 * 1000, // Cache for 1 minute
   });
 
   const availability = data?.data ?? [];
   const bookedSlots = bookedSlotsData?.bookedSlots ?? [];
-  const googleConflicts = googleConflictsData?.conflicts ?? [];
-  const hasGoogleIntegration = googleIntegrationData?.hasIntegration ?? false;
+  const googleConflicts = (googleConflictsData?.conflicts ?? []) as string[];
+  const hasGoogleIntegration = !isGoogleIntegrationError && (googleIntegrationData?.hasIntegration ?? false);
+
+  // Log Google Calendar integration status for debugging
+  if (isGoogleIntegrationError) {
+    console.log("Google Calendar integration not available - using local availability only");
+  }
+  if (isGoogleConflictsError) {
+    console.log("Google Calendar conflicts fetch failed - showing local availability only");
+  }
 
   // Function to check if a time slot is in the excluded afternoon period (12:00-16:00)
   const isAfternoonSlot = (slot: string) => {
