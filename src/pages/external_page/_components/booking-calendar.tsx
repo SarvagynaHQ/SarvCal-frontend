@@ -16,15 +16,31 @@ import HourButton from "@/components/HourButton";
 
 interface BookingCalendarProps {
   eventId: string;
+  mode?: 'book' | 'reschedule';
+  onSlotSelect: (slot: string) => void;
+  isPending?: boolean;
   minValue?: DateValue;
   defaultValue?: DateValue;
 }
 
 const BookingCalendar = ({
   eventId,
+  mode = 'book',
+  onSlotSelect,
+  isPending,
   minValue,
   defaultValue,
 }: BookingCalendarProps) => {
+  if (isPending) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-4 rounded-lg">
+          <p>Processing {mode === 'reschedule' ? 'rescheduling' : 'booking'}...</p>
+        </div>
+      </div>
+    );
+  }
+
   const {
     timezone,
     hourType,
@@ -141,6 +157,14 @@ const BookingCalendar = ({
 
   const selectedTime = decodeSlot(selectedSlot, timezone, hourType);
 
+  const buttonText = mode === 'reschedule' ? 'Reschedule' : 'Book';
+
+  const handleTimeSlotSelect = (slot: string) => {
+    if (onSlotSelect) {
+      onSlotSelect(slot);
+    }
+  };
+
   return (
     <div className="relative lg:flex-[1_1_50%] w-full flex-shrink-0 transition-all duration-220 ease-out p-4 pr-0">
       {/* Loader Overlay */}
@@ -244,7 +268,7 @@ const BookingCalendar = ({
                             className="w-full cursor-pointer h-[52px] bg-[rgb(0,105,255)] text-white rounded-[4px] hover:bg-[rgba(0,105,255,0.8)] font-semibold tracking-wide"
                             onClick={handleNext}
                           >
-                            Next
+                            {buttonText}
                           </button>
                         </div>
 
@@ -259,7 +283,7 @@ const BookingCalendar = ({
                            }
                            `}
                           onClick={() => {
-                            handleSelectSlot(slot);
+                            handleTimeSlotSelect(slot);
                           }}
                         >
                           {formattedSlot}

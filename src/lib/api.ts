@@ -177,3 +177,21 @@ export const checkGoogleCalendarIntegrationQueryFn = async (
   const response = await PublicAPI.get(`/integration/google-calendar/check/${eventId}`);
   return response.data;
 };
+
+// Add to existing API functions
+export const getBookingDetails = async (bookingId: string) => {
+  const response = await API.get(`/api/booking/${bookingId}`);
+  if (response.status !== 200) throw new Error('Failed to fetch booking details');
+  return response.data;
+};
+
+export const rescheduleBooking = async (data: { 
+  bookingId: string; 
+  newStartTime: string 
+}) => {
+  const response = await API.patch(`/api/meeting/reschedule/${data.bookingId}`, {
+    newStartTime: data.newStartTime
+  });
+  if (response.status !== 200) throw new Error('Failed to reschedule booking');
+  return response.data;
+};
