@@ -58,6 +58,7 @@ export const useBookingState = () => {
     //console.log(slotDateInUTC.toISOString(), ".toISOString()");
     const encodedSlot = encodeURIComponent(slotDateInUTC.toISOString());
     setSelectedSlot(encodedSlot);
+    handleNext();
   };
 
   const handleNext = () => {

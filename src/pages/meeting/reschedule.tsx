@@ -67,10 +67,6 @@ const ReschedulePage = () => {
                     eventId={meeting.id}
                     minValue={today(timezone)}
                     defaultValue={today(timezone)}
-                    onSlotSelect={(slot) => {
-                      // Handle slot selection
-                      console.log("Selected slot:", slot);
-                    }}
                     isPending={false}
                   />
                 </Fragment>
