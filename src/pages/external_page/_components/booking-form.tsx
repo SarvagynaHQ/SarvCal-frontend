@@ -69,6 +69,7 @@ const BookingForm = (props: { eventId: string; duration: number }) => {
       eventId,
       startTime: startTime.toISOString(),
       endTime: endTime.toISOString(),
+      timezone,
     };
     console.log("Form Data:", payload);
 

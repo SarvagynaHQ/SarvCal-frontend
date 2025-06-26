@@ -16,7 +16,6 @@ import { useStore } from "@/store/store";
 const ReschedulePage = () => {
   const param = useParams();
   const meetingId = param.meetingId as string;
-  const { user } = useStore();
 
   const { next, timezone, selectedDate } = useBookingState();
 
