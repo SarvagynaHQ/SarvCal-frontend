@@ -5,6 +5,7 @@ import { useBookingState } from "@/hooks/use-booking-state";
 import { decodeSlot, formatSlot } from "@/lib/helper";
 import { 
   getPublicAvailabilityByEventIdQueryFn,
+  getPublicBookedSlotsByEventIdAndDateQueryFn,
   getGoogleCalendarConflictsQueryFn,
   checkGoogleCalendarIntegrationQueryFn
 } from "@/lib/api";
@@ -40,6 +41,18 @@ const BookingCalendar = ({
     queryFn: () => getPublicAvailabilityByEventIdQueryFn(eventId),
   });
 
+  // Fetch booked slots for the selected date to hide them completely
+  const { data: bookedSlotsData, isFetching: isBookedSlotsFetching } = useQuery({
+    queryKey: ["booked_slots", eventId, selectedDate?.toString()],
+    queryFn: () => getPublicBookedSlotsByEventIdAndDateQueryFn(
+      eventId,
+      selectedDate ? format(selectedDate.toDate(timezone), "yyyy-MM-dd") : ""
+    ),
+    enabled: !!eventId && !!selectedDate,
+    retry: false, // Don't retry if endpoint doesn't exist
+    staleTime: 30 * 1000, // Cache for 30 seconds (short cache for real-time booking updates)
+  });
+
   // Check if Google Calendar integration is enabled
   const { data: googleIntegrationData, isError: isGoogleIntegrationError } = useQuery({
     queryKey: ["google_calendar_integration", eventId],
@@ -66,6 +79,7 @@ const BookingCalendar = ({
   });
 
   const availability = data?.data ?? [];
+  const bookedSlots = bookedSlotsData?.bookedSlots ?? [];
   const googleConflicts = (googleConflictsData?.conflicts ?? []) as string[];
   const hasGoogleIntegration = !isGoogleIntegrationError && (googleIntegrationData?.isConnected ?? false);
 
@@ -102,8 +116,11 @@ const BookingCalendar = ({
   // Filter out afternoon slots (12:00 PM - 4:00 PM)
   const timeSlots = allTimeSlots.filter(slot => !isAfternoonSlot(slot));
 
+  // Filter out booked slots
+  const filteredTimeSlots = timeSlots.filter(slot => !bookedSlots.includes(slot));
+
   // Filter out Google Calendar conflicts
-  const filteredTimeSlots = timeSlots.filter(slot => !googleConflicts.includes(slot));
+  const finalTimeSlots = filteredTimeSlots.filter(slot => !googleConflicts.includes(slot));
 
   const isDateUnavailable = (date: DateValue) => {
     // Get the day of the week (e.g., "MONDAY")
@@ -127,18 +144,20 @@ const BookingCalendar = ({
   return (
     <div className="relative lg:flex-[1_1_50%] w-full flex-shrink-0 transition-all duration-220 ease-out p-4 pr-0">
       {/* Loader Overlay */}
-      {(isFetching || isGoogleConflictsFetching) && (
+      {(isFetching || isGoogleConflictsFetching || isBookedSlotsFetching) && (
         <div className="flex bg-white/60 !z-30 absolute w-[95%] h-full items-center justify-center">
           <div className="flex flex-col items-center gap-2">
             <Loader size="lg" color="black" />
             <p className="text-sm text-gray-600">
-              {isFetching && isGoogleConflictsFetching 
-                ? "Loading availability and syncing calendar..."
+              {isFetching && isGoogleConflictsFetching && isBookedSlotsFetching 
+                ? "Loading availability, syncing calendar, and fetching booked slots..."
                 : isFetching 
                   ? "Loading availability..."
                   : isGoogleConflictsFetching && hasGoogleIntegration
                     ? "Syncing with Google Calendar..."
-                    : "Loading..."
+                    : isBookedSlotsFetching
+                      ? "Fetching booked slots..."
+                      : "Loading..."
               }
             </p>
           </div>
@@ -196,7 +215,7 @@ const BookingCalendar = ({
                 className="flex-[1_1_100px] pr-[8px] overflow-x-hidden overflow-y-auto scrollbar-thin
              scrollbar-track-transparent scroll--bar h-[400px]"
               >
-                {filteredTimeSlots.map((slot, i) => {
+                {finalTimeSlots.map((slot, i) => {
                   const formattedSlot = formatSlot(slot, timezone, hourType);
                   return (
                     <div role="list" key={i}>
@@ -238,23 +257,12 @@ const BookingCalendar = ({
                                ? "opacity-0"
                                : "opacity-100"
                            }
-                           ${
-                             googleConflicts.includes(slot)
-                               ? "bg-orange-100 border-orange-300 text-orange-600 cursor-not-allowed opacity-60"
-                               : ""
-                           }
                            `}
                           onClick={() => {
-                            if (!googleConflicts.includes(slot)) {
-                              handleSelectSlot(slot);
-                            }
+                            handleSelectSlot(slot);
                           }}
-                          disabled={googleConflicts.includes(slot)}
                         >
                           {formattedSlot}
-                          {googleConflicts.includes(slot) && (
-                            <span className="block text-xs">Calendar conflict</span>
-                          )}
                         </button>
                       </div>
                     </div>

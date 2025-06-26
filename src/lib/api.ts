@@ -128,6 +128,15 @@ export const scheduleMeetingMutationFn = async (data: CreateMeetingType) => {
   return response.data;
 };
 
+// Get booked slots for a specific date to hide them from available slots
+export const getPublicBookedSlotsByEventIdAndDateQueryFn = async (
+  eventId: string,
+  date: string
+): Promise<{message: string, bookedSlots: string[]}> => {
+  const response = await PublicAPI.get(`/meeting/public/booked-slots/${eventId}?date=${date}`);
+  return response.data;
+};
+
 // Get Google Calendar conflicts for real-time availability
 export const getGoogleCalendarConflictsQueryFn = async (
   eventId: string, 
