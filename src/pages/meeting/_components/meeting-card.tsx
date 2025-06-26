@@ -1,5 +1,5 @@
 import { Fragment, useRef, useState } from "react";
-import { ChevronDown, Trash2Icon } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MeetingType, PeriodType } from "@/types/api.type";
 import { format, parseISO } from "date-fns";
@@ -101,24 +101,22 @@ const MeetingCard = (props: {
       >
         <div className="flex flex-col-reverse md:flex-row pb-5">
           {period === PeriodEnum.UPCOMING && (
-            <div className="box-border shrink-0 w-[80%] md:w-[310px] pr-[80px] pl-[40px] mb-5">
-              <div>
-                <Button
-                  variant="outline"
-                  type="button"
-                  className="!w-full border-[#476788] text-[#0a2540] font-normal text-sm"
-                  onClick={onCancel}
-                >
-                  {isPending ? (
-                    <Loader color="black" />
-                  ) : (
-                    <Fragment>
-                      <Trash2Icon />
-                      <span>Cancel</span>
-                    </Fragment>
-                  )}
-                </Button>
-              </div>
+            <div className="flex gap-2 mt-4">
+              <Button
+                variant="outline"
+                className="!text-[#006bff] !border-[#006bff] hover:!bg-[#006bff]/10"
+                onClick={onCancel}
+                disabled={isPending}
+              >
+                {isPending ? <Loader size="sm" /> : 'Cancel'}
+              </Button>
+              <Button
+                variant="outline"
+                className="!text-[#4caf50] !border-[#4caf50] hover:!bg-[#4caf50]/10"
+                onClick={() => window.location.href = `/reschedule/${meeting.id}`}
+              >
+                Reschedule
+              </Button>
             </div>
           )}
           <div className="flex-1">
