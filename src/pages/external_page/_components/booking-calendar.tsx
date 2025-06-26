@@ -4,8 +4,7 @@ import { CalendarDate, DateValue } from "@internationalized/date";
 import { useBookingState } from "@/hooks/use-booking-state";
 import { decodeSlot, formatSlot } from "@/lib/helper";
 import { 
-  getPublicAvailabilityByEventIdQueryFn, 
-  getPublicBookedSlotsByEventIdQueryFn,
+  getPublicAvailabilityByEventIdQueryFn,
   getGoogleCalendarConflictsQueryFn,
   checkGoogleCalendarIntegrationQueryFn
 } from "@/lib/api";
@@ -41,14 +40,6 @@ const BookingCalendar = ({
     queryFn: () => getPublicAvailabilityByEventIdQueryFn(eventId),
   });
 
-  // Fetch already booked slots to prevent overbooking
-  const { data: bookedSlotsData } = useQuery({
-    queryKey: ["booked_slots", eventId],
-    queryFn: () => getPublicBookedSlotsByEventIdQueryFn(eventId),
-    enabled: !!eventId, // Only run if eventId exists
-    retry: false, // Don't retry if endpoint doesn't exist
-  });
-
   // Check if Google Calendar integration is enabled
   const { data: googleIntegrationData, isError: isGoogleIntegrationError } = useQuery({
     queryKey: ["google_calendar_integration", eventId],
@@ -75,7 +66,6 @@ const BookingCalendar = ({
   });
 
   const availability = data?.data ?? [];
-  const bookedSlots = bookedSlotsData?.bookedSlots ?? [];
   const googleConflicts = (googleConflictsData?.conflicts ?? []) as string[];
   const hasGoogleIntegration = !isGoogleIntegrationError && (googleIntegrationData?.isConnected ?? false);
 
@@ -112,11 +102,8 @@ const BookingCalendar = ({
   // Filter out afternoon slots (12:00 PM - 4:00 PM)
   const timeSlots = allTimeSlots.filter(slot => !isAfternoonSlot(slot));
 
-  // Filter out booked slots
-  const availableTimeSlots = timeSlots.filter(slot => !bookedSlots.includes(slot));
-
   // Filter out Google Calendar conflicts
-  const filteredTimeSlots = availableTimeSlots.filter(slot => !googleConflicts.includes(slot));
+  const filteredTimeSlots = timeSlots.filter(slot => !googleConflicts.includes(slot));
 
   const isDateUnavailable = (date: DateValue) => {
     // Get the day of the week (e.g., "MONDAY")
@@ -218,7 +205,6 @@ const BookingCalendar = ({
                         className="m-[10px_10px_10px_0] relative text-[15px]"
                       >
                         {/* Selected Time and Next Button */}
-                        {/* Selected Time and Next Button */}
                         <div
                           className={`absolute inset-0 z-20 flex items-center gap-1.5 justify-between
                              transform transition-all duration-400 ease-in-out ${
@@ -247,15 +233,10 @@ const BookingCalendar = ({
                         <button
                           type="button"
                           className={`w-full h-[52px] cursor-pointer border border-[rgba(0,105,255,0.5)] text-[rgb(0,105,255)] rounded-[4px] font-semibold hover:border-2 hover:border-[rgb(0,105,255)] tracking-wide transition-all duration-400 ease-in-out
-                         ${
-                           selectedTime === formattedSlot
-                             ? "opacity-0"
-                             : "opacity-100"
-                         }
                            ${
-                             bookedSlots.includes(slot)
-                               ? "bg-red-100 border-red-300 text-red-600 cursor-not-allowed opacity-60"
-                               : ""
+                             selectedTime === formattedSlot
+                               ? "opacity-0"
+                               : "opacity-100"
                            }
                            ${
                              googleConflicts.includes(slot)
@@ -264,17 +245,14 @@ const BookingCalendar = ({
                            }
                            `}
                           onClick={() => {
-                            if (!bookedSlots.includes(slot) && !googleConflicts.includes(slot)) {
+                            if (!googleConflicts.includes(slot)) {
                               handleSelectSlot(slot);
                             }
                           }}
-                          disabled={bookedSlots.includes(slot) || googleConflicts.includes(slot)}
+                          disabled={googleConflicts.includes(slot)}
                         >
                           {formattedSlot}
-                          {bookedSlots.includes(slot) && (
-                            <span className="block text-xs">Already booked</span>
-                          )}
-                          {googleConflicts.includes(slot) && !bookedSlots.includes(slot) && (
+                          {googleConflicts.includes(slot) && (
                             <span className="block text-xs">Calendar conflict</span>
                           )}
                         </button>

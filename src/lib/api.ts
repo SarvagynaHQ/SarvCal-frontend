@@ -128,12 +128,6 @@ export const scheduleMeetingMutationFn = async (data: CreateMeetingType) => {
   return response.data;
 };
 
-// Get booked slots for an event (for overbooking prevention)
-export const getPublicBookedSlotsByEventIdQueryFn = async (eventId: string): Promise<{message: string, bookedSlots: string[]}> => {
-  const response = await PublicAPI.get(`/meeting/public/booked-slots/${eventId}`);
-  return response.data;
-};
-
 // Get Google Calendar conflicts for real-time availability
 export const getGoogleCalendarConflictsQueryFn = async (
   eventId: string, 
