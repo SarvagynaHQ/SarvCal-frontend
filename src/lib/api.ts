@@ -133,3 +133,29 @@ export const getPublicBookedSlotsByEventIdQueryFn = async (eventId: string): Pro
   const response = await PublicAPI.get(`/meeting/public/booked-slots/${eventId}`);
   return response.data;
 };
+
+// Get Google Calendar conflicts for real-time availability
+export const getGoogleCalendarConflictsQueryFn = async (
+  eventId: string, 
+  date: string
+): Promise<{conflicts: string[], message: string}> => {
+  const response = await PublicAPI.get(`/calendar/google/conflicts/${eventId}?date=${date}`);
+  return response.data;
+};
+
+// Get real-time availability with Google Calendar sync
+export const getRealTimeAvailabilityQueryFn = async (
+  eventId: string,
+  date: string
+): Promise<{availableSlots: string[], conflicts: string[], message: string}> => {
+  const response = await PublicAPI.get(`/availability/realtime/${eventId}?date=${date}`);
+  return response.data;
+};
+
+// Check if user has Google Calendar integration enabled
+export const checkGoogleCalendarIntegrationQueryFn = async (
+  eventId: string
+): Promise<{hasIntegration: boolean, message: string}> => {
+  const response = await PublicAPI.get(`/integration/google-calendar/check/${eventId}`);
+  return response.data;
+};
