@@ -11,7 +11,6 @@ import { getMeetingDetailsQueryFn } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { ErrorAlert } from "@/components/ErrorAlert";
 import { Loader } from "@/components/loader";
-import { useStore } from "@/store/store";
 
 const ReschedulePage = () => {
   const param = useParams();

@@ -26,7 +26,7 @@ const BookingForm = (props: { eventId: string; duration: number }) => {
   const { eventId, duration } = props;
   const [meetLink, setMeetLink] = useState("");
 
-  const { selectedDate, isSuccess, selectedSlot, handleSuccess } =
+  const { selectedDate, isSuccess, selectedSlot, handleSuccess, timezone } =
     useBookingState();
 
   const { mutate, isPending } = useMutation({
